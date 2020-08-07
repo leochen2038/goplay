@@ -33,7 +33,7 @@ The commands are:
 
 	command = os.Args[1]
 	env.FrameworkName = "github.com/leochen2038/play"
-	env.FrameworkVer = "v1.0.0"
+	env.FrameworkVer = "v0.2.1"
 	env.ProjectPath = os.Args[2]
 	env.GoVersion = runtime.Version()[2:]
 }
