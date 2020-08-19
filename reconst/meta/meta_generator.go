@@ -88,40 +88,48 @@ func generateCode(meta Meta) string {
 	funcName := formatUcfirstName(meta.Module) + formatUcfirstName(meta.Name)
 	src := "package db\n"
 	if meta.Strategy.Storage.Type == "mongodb" {
-		if meta.Strategy.Storage.Drive == "default" || meta.Strategy.Storage.Drive == "mongodb" {
+		if meta.Strategy.Storage.Drive == "" || meta.Strategy.Storage.Drive == "default" {
+			meta.Strategy.Storage.Drive = "mongodb"
+		}
+		if meta.Strategy.Storage.Drive == "mongodb" {
 			src += fmt.Sprintf(`
 import (
 	"%s"
 	"go.mongodb.org/mongo-driver/bson/primitive"
-	"%s/database/%s"
+	"%s/database/mongodb"
 	"time"
 )
-`, env.FrameworkName, env.FrameworkName, meta.Strategy.Storage.Drive)
+`, env.FrameworkName, env.FrameworkName)
 		} else {
 			src += fmt.Sprintf(`
 import (
 	"%s"
 	"go.mongodb.org/mongo-driver/bson/primitive"
-	"%s"
+	mongodb "%s"
 	"time"
 )
 `, env.FrameworkName, meta.Strategy.Storage.Drive)
+			meta.Strategy.Storage.Drive = "mongodb"
 		}
 	} else {
-		if meta.Strategy.Storage.Drive == "default" || meta.Strategy.Storage.Drive == "mysql" {
+		if meta.Strategy.Storage.Drive == "default" || meta.Strategy.Storage.Drive == "" {
+			meta.Strategy.Storage.Drive = "mysql"
+		}
+		if meta.Strategy.Storage.Drive == "mysql" {
 			src += fmt.Sprintf(`
 import (
 	"%s"
-	"%s/database/%s"
+	"%s/database/mysql"
 )
-`, env.FrameworkName, env.FrameworkName, meta.Strategy.Storage.Drive)
+`, env.FrameworkName, env.FrameworkName)
 		} else {
 			src += fmt.Sprintf(`
 import (
 	"%s"
-	"%s"
+	mysql "%s"
 )
 `, env.FrameworkName, meta.Strategy.Storage.Drive)
+			meta.Strategy.Storage.Drive = "mysql"
 		}
 	}
 
