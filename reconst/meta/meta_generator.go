@@ -83,7 +83,7 @@ func generateCode(meta Meta) string {
 	whereOr := map[string]string{"Where": "true", "Or": "false"}
 	con1List := [...]string{"Equal", "NotEqual", "Less", "Greater", "Like"}
 	con2List := [...]string{"Between"}
-	conslice := [...]string{"In"}
+	conslice := [...]string{"In", "NotIn"}
 
 	funcName := formatUcfirstName(meta.Module) + formatUcfirstName(meta.Name)
 	src := "package db\n"
