@@ -12,18 +12,23 @@ import (
 	"%s"
 )
 
-/**
- * %s.
- *
- * @version 1.0.0
- * @author anonymous <anonymous@example.com>
- * @copyright 2019-2020 The Play Framework
- * @history:
- * 			1.0.0 | anonymous | %s | initialization
- */
+// copyright 2019-2020 The Play Framework
+//
+// %s.
+// version 1.0.0
+// author anonymous <anonymous@example.com>
+// copyright 2019-2020 The Play Framework
+//
+// history:
+// 1.0.0 | anonymous | %s | initialization
 
 type %s struct {
-	
+	Input struct {
+		
+    }
+	Output struct {
+		
+	}
 }
 
 func (p *%s)Run(ctx *play.Context) (string, error) {
