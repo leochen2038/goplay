@@ -23,12 +23,8 @@ import (
 // 1.0.0 | anonymous | %s | initialization
 
 type %s struct {
-	Input struct {
-		
-    }
-	Output struct {
-		
-	}
+	Input struct {}
+	Output struct {}
 }
 
 func (p *%s)Run(ctx *play.Context) (string, error) {

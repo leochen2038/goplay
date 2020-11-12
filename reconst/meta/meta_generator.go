@@ -271,6 +271,12 @@ func (q *query%s)OrderBy(key, val string) *query%s {
 `, funcName, funcName)
 
 	src += fmt.Sprintf(`
+func (q *query%s)GroupBy(key) *query%s {
+	q.query.Group = append(q.query.Group, key)
+	return q
+}
+`, funcName, funcName)
+	src += fmt.Sprintf(`
 func (q *query%s)Count() (int64, error) {
 	return %s.Count(&q.query)
 }
@@ -441,7 +447,7 @@ func getGolangType(t string) string {
 			return "[]interface{}"
 		}
 	}
-	if t == "ctime" || t == "mtime" {
+	if t == "ctime" || t == "mtime" || t == "dtime" {
 		return "int64"
 	}
 	if t == "float" {
