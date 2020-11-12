@@ -260,7 +260,6 @@ func (q *query%s)%s%s%s(s []%s) *query%s {
 `, funcName, where, ucfirst(vb.Name), cond, getGolangType(vb.Type), funcName, wherebool, vb.Name, cond)
 			}
 		}
-
 	}
 
 	src += fmt.Sprintf(`
@@ -271,7 +270,7 @@ func (q *query%s)OrderBy(key, val string) *query%s {
 `, funcName, funcName)
 
 	src += fmt.Sprintf(`
-func (q *query%s)GroupBy(key) *query%s {
+func (q *query%s)GroupBy(key string) *query%s {
 	q.query.Group = append(q.query.Group, key)
 	return q
 }
