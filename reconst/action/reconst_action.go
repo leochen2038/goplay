@@ -42,7 +42,7 @@ func genRegistCrontabCode(path string) (registCode string) {
 				submath := rePack.FindSubmatch(code)
 				if len(submath) > 1 {
 					packageName = string(submath[1])
-					crontab[filepath.Dir(filename)] = struct{}{}
+					crontab[strings.Replace(filepath.Dir(filename), path, "crontab", 1)] = struct{}{}
 				}
 			}
 			for _, v := range submath {
@@ -93,7 +93,7 @@ func updateRegister(project, frameworkName string) (err error) {
 
 	src := "package main\n\nimport (\n\t\"" + frameworkName + "\"\n"
 	for k, _ := range crontab {
-		src += fmt.Sprintf("\t\"%s\"\n", strings.Replace(k, env.ProjectPath, module, 1))
+		src += fmt.Sprintf("\t\"%s/%s\"\n", module, k)
 	}
 	for k, _ := range packages {
 		src += fmt.Sprintf("\t\"%s/processor/%s\"\n", module, k)
