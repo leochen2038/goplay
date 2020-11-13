@@ -51,7 +51,8 @@ func MetaGenerator() error {
 	return filepath.Walk(env.ProjectPath+"/assets/meta", func(filename string, fi os.FileInfo, err error) error {
 		var data []byte
 		var meta Meta
-		if !fi.IsDir() && strings.HasSuffix(filename, ".xml") {
+
+		if fi != nil && !fi.IsDir() && strings.HasSuffix(filename, ".xml") {
 			if data, err = ioutil.ReadFile(filename); err != nil {
 				return err
 			}
