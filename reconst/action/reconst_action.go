@@ -26,6 +26,7 @@ func ReconstAction() (err error) {
 		registerCode = registerCode[:len(registerCode)-1] + "})\n"
 	}
 	registerCode += "}"
+
 	updateRegister(env.ProjectPath, env.FrameworkName)
 	return
 }
@@ -104,7 +105,7 @@ func updateRegister(project, frameworkName string) (err error) {
 	src += ")\n\n"
 
 	src += registerCode
-	path := fmt.Sprintf("%s/register.go", project)
+	path := fmt.Sprintf("%s/init.go", project)
 	if err = ioutil.WriteFile(path, []byte(src), 0644); err != nil {
 		return
 	}
