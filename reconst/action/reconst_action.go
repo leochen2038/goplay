@@ -19,7 +19,7 @@ func ReconstAction() (err error) {
 	actions, err := getActions(env.ProjectPath + "/assets/action")
 
 	registerCode = "func init() {\n"
-	registerCode += genRegistCrontabCode(env.ProjectPath + "/crontab")
+	registerCode += genRegisterCronCode(env.ProjectPath + "/crontab")
 	for _, action := range actions {
 		registerCode += "\tplay.RegisterAction(\"" + action.name + "\", " + "func()interface{}{return "
 		genNextProcessorCode(action.handlerList, &action)
@@ -31,7 +31,7 @@ func ReconstAction() (err error) {
 	return
 }
 
-func genRegistCrontabCode(path string) (registCode string) {
+func genRegisterCronCode(path string) (registCode string) {
 	reJob := regexp.MustCompile(`type (\w+) struct`)
 	rePack := regexp.MustCompile(`package (\w+)`)
 	filepath.Walk(path, func(filename string, info os.FileInfo, err error) error {

@@ -86,7 +86,7 @@ func createLibrary() (err error) {
 }
 
 func createUtils() (err error) {
-	return os.Mkdir(env.ProjectPath+"/utils", 0744)
+	return os.Mkdir(env.ProjectPath+"/middleware", 0744)
 }
 
 func createTemplate() (err error) {
