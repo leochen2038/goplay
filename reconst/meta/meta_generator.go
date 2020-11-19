@@ -30,6 +30,7 @@ type MetaFields struct {
 
 type MetaField struct {
 	Name    string `xml:"name,attr"`
+	Alias   string `xml:"alias,attr"`
 	Type    string `xml:"type,attr"`
 	Note    string `xml:"note,attr"`
 	Default string `xml:"default,attr"`
@@ -138,7 +139,11 @@ import (
 	src += fmt.Sprintf("\ntype Meta%s struct {\n", funcName)
 	src += "\t" + formatUcfirstName(meta.Key.Name) + " "
 	if meta.Strategy.Storage.Type == "mongodb" {
-		src += "primitive.ObjectID\t `bson:\"" + meta.Key.Name + "\"`\n"
+		src += "primitive.ObjectID\t `bson:\"" + meta.Key.Name + "\""
+		if meta.Key.Alias != "" {
+			src += ` json:"` + meta.Key.Alias + `"`
+		}
+		src += "`\n"
 	} else {
 		if meta.Key.Type == "auto" {
 			src += "int\t `db:\"" + meta.Key.Name + "\"`\n"
@@ -149,7 +154,11 @@ import (
 	for _, vb := range meta.Fields.List {
 		src += "\t" + ucfirst(vb.Name) + " " + getGolangType(vb.Type)
 		if meta.Strategy.Storage.Type == "mongodb" {
-			src += "\t `bson:\"" + vb.Name + "\"`\n"
+			src += "\t `bson:\"" + vb.Name + "\""
+			if vb.Alias != "" {
+				src += ` json:"` + vb.Alias + `"`
+			}
+			src += "`\n"
 		} else {
 			src += "\t `db:\"" + vb.Name + "\"`\n"
 		}
@@ -442,7 +451,7 @@ func getGolangType(t string) string {
 		case "array:float":
 			return "[]float64"
 		case "array:array":
-			return "[]interface{}"
+			return "[][]interface{}"
 		case "array:object":
 			return "[]interface{}"
 		}
