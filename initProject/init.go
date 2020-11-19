@@ -60,7 +60,10 @@ go %s
 
 require (
 	%s %s
-)`, name, goVersion, env.FrameworkName, env.FrameworkVer)), 0644); err != nil {
+)
+
+replace github.com/coreos/go-systemd => github.com/coreos/go-systemd/v22 v22.0.0
+`, name, goVersion, env.FrameworkName, env.FrameworkVer)), 0644); err != nil {
 			return
 		}
 		exec.Command("gofmt", "-w", env.ProjectPath+"/main.go").Run()
