@@ -336,18 +336,26 @@ func (q *query%s)GetList() ([]Meta%s, error) {
 `, funcName, funcName, funcName, meta.Strategy.Storage.Drive)
 
 	if meta.Strategy.Storage.Type == "mongodb" {
+		var msrc, csrc string
+		if mtimeField, err := getSpTTime(meta.Fields, "mtime"); err == nil {
+			msrc = "meta." + ucfirst(mtimeField.Name) + " = time.Now().Unix()"
+		}
+		if ctimeField, err := getSpTTime(meta.Fields, "ctime"); err == nil {
+			csrc = "meta." + ucfirst(ctimeField.Name) + " = time.Now().Unix()"
+		}
+
 		src += fmt.Sprintf(`
 func (q *query%s)Save(meta *Meta%s) error {
-	meta.Fmtime = time.Now().Unix()
+	%s
 	if meta.Id != primitive.NilObjectID {
 		return %s.Save(meta, &meta.Id, &q.query)
 	}
 
-	meta.Fctime = time.Now().Unix()
+	%s
 	meta.Id = primitive.NewObjectID()
 	return %s.Save(meta, nil, &q.query)
 }
-`, funcName, funcName, meta.Strategy.Storage.Drive, meta.Strategy.Storage.Drive)
+`, funcName, funcName, msrc, meta.Strategy.Storage.Drive, csrc, meta.Strategy.Storage.Drive)
 	} else {
 		src += fmt.Sprintf(`
 func (q *query%s)Save(meta *Meta%s) error {
@@ -383,6 +391,15 @@ func (q *query%s)Set%s(val %s, opt ...string) *query%s {
 `, funcName, formatUcfirstName(field.Name), getGolangType(field.Type), funcName, field.Name)
 	}
 	return src
+}
+
+func getSpTTime(fields MetaFields, t string) (MetaField, error) {
+	for _, v := range fields.List {
+		if v.Type == t {
+			return v, nil
+		}
+	}
+	return MetaField{}, errors.New("can not find " + t)
 }
 
 func writeMeta(meta Meta) (err error) {
@@ -454,6 +471,18 @@ func getGolangType(t string) string {
 			return "[][]interface{}"
 		case "array:object":
 			return "[]interface{}"
+		}
+	}
+	if strings.HasPrefix(t, "map") {
+		switch t {
+		case "map<string>":
+			return "map[string]interface{}"
+		case "map<string>:int":
+			return "map[string]int"
+		case "map<string>:int64":
+			return "map[string]int64"
+		case "map<string>:string":
+			return "map[string]string"
 		}
 	}
 	if t == "ctime" || t == "mtime" || t == "dtime" {
