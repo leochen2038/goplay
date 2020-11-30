@@ -475,13 +475,13 @@ func getGolangType(t string) string {
 	}
 	if strings.HasPrefix(t, "map") {
 		switch t {
-		case "map<string>":
+		case "map":
 			return "map[string]interface{}"
-		case "map<string>:int":
+		case "map:int":
 			return "map[string]int"
-		case "map<string>:int64":
+		case "map:int64":
 			return "map[string]int64"
-		case "map<string>:string":
+		case "map:string":
 			return "map[string]string"
 		}
 	}
