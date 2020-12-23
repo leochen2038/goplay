@@ -105,7 +105,9 @@ func updateRegister(project, frameworkName string) (err error) {
 	if len(packages) > 0 {
 		src += "\"unsafe\"\n"
 	}
-	src += ")\n\n"
+	if len(crontab) > 0 || len(packages) > 0 {
+		src += ")\n\n"
+	}
 
 	src += registerCode
 	path := fmt.Sprintf("%s/init.go", project)
