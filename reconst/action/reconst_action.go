@@ -92,7 +92,10 @@ func updateRegister(project, frameworkName string) (err error) {
 		return
 	}
 
-	src := "package main\n\nimport (\n\t\"" + frameworkName + "\"\n"
+	src := "package main\n\n"
+	if len(crontab) > 0 || len(packages) > 0 {
+		src += "import (\n\t\"" + frameworkName + "\"\n"
+	}
 	for k, _ := range crontab {
 		src += fmt.Sprintf("\t\"%s/%s\"\n", module, k)
 	}

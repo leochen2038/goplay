@@ -36,13 +36,13 @@ func getActions(path string) (map[string]action, error) {
 
 func initActions(path string) error {
 	err := filepath.Walk(path, func(filename string, fi os.FileInfo, err error) error {
-		if !fi.IsDir() && filename[0:1] != "." {
+		if !fi.IsDir() && fi.Name()[0:1] != "." {
 			d, err := ioutil.ReadFile(filename)
 			if err != nil {
 				return err
 			}
 
-			tokens, err := parseTokenFrom(bytes.NewReader(d))
+			tokens, err := parseTokenFrom(bytes.NewReader(d), filename)
 			if err != nil {
 				return err
 			}
@@ -123,7 +123,7 @@ func buildActions(tokens []string) error {
 }
 
 // 从输入流里分析出token
-func parseTokenFrom(reader *bytes.Reader) ([]string, error) {
+func parseTokenFrom(reader *bytes.Reader, filename string) ([]string, error) {
 	token := make([]byte, 0, 32)
 	tokens := make([]string, 0, 128)
 
@@ -156,7 +156,7 @@ func parseTokenFrom(reader *bytes.Reader) ([]string, error) {
 		}
 		if c == '{' || c == '(' {
 			if len(token) == 0 {
-				return nil, errors.New("miss action name or processor define befer '{' or '('")
+				return nil, errors.New("miss action name or processor define befer '{' or '(' by parse:" + filename)
 			}
 			tokens = append(tokens, string(token))
 			tokens = append(tokens, string(c))
