@@ -484,7 +484,7 @@ func getGolangType(t string) string {
 		case "map:string":
 			return "map[string]string"
 		case "map:map:string":
-			return "map[string]map[string]"
+			return "map[string]map[string]string"
 		}
 	}
 	if t == "ctime" || t == "mtime" || t == "dtime" {
