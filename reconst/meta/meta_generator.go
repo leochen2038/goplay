@@ -146,10 +146,14 @@ import (
 		src += "`\n"
 	} else {
 		if meta.Key.Type == "auto" {
-			src += "int\t `db:\"" + meta.Key.Name + "\"`\n"
+			src += "int\t `db:\"" + meta.Key.Name + "\""
 		} else {
-			src += meta.Key.Type + "\t `db:\"" + meta.Key.Name + "\"`\n"
+			src += meta.Key.Type + "\t `db:\"" + meta.Key.Name + "\""
 		}
+		if meta.Key.Alias != "" {
+			src += ` json:"` + meta.Key.Alias + `"`
+		}
+		src += "`\n"
 	}
 	for _, vb := range meta.Fields.List {
 		src += "\t" + ucfirst(vb.Name) + " " + getGolangType(vb.Type)
@@ -160,7 +164,11 @@ import (
 			}
 			src += "`\n"
 		} else {
-			src += "\t `db:\"" + vb.Name + "\"`\n"
+			src += "\t `db:\"" + vb.Name + "\""
+			if vb.Alias != "" {
+				src += ` json:"` + vb.Alias + `"`
+			}
+			src += "`\n"
 		}
 	}
 	src += "}\n"
@@ -304,6 +312,18 @@ func (q *query%s)Limit(start int64, count int64) *query%s {
 	return q
 }
 `, funcName, funcName)
+
+	if meta.Strategy.Storage.Type == "mongodb" {
+		src += fmt.Sprintf(`
+func (q *query%s)UpdateAndGetOne() (*Meta%s, error) {
+	meta := &Meta%s{}
+	if err := %s.UpdateAndGetOne(meta, &q.query); err != nil {
+		return nil, err 
+	}
+	return meta, nil
+}
+`, funcName, funcName, funcName, meta.Strategy.Storage.Drive)
+	}
 
 	if meta.Strategy.Storage.Type == "mongodb" {
 		src += fmt.Sprintf(`
@@ -463,6 +483,8 @@ func getGolangType(t string) string {
 			return "[]interface{}"
 		case "array:int":
 			return "[]int"
+		case "array:int64":
+			return "[]int64"
 		case "array:string":
 			return "[]string"
 		case "array:float":
@@ -471,6 +493,8 @@ func getGolangType(t string) string {
 			return "[][]interface{}"
 		case "array:object":
 			return "[]interface{}"
+		case "array:map":
+			return "[]map[string]interface{}"
 		}
 	}
 	if strings.HasPrefix(t, "map") {

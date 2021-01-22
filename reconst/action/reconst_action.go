@@ -12,7 +12,7 @@ import (
 )
 
 var registerCode string
-var packages = map[string]struct{}{}
+var packages = map[string]string{}
 var crontab = map[string]struct{}{}
 
 func ReconstAction() (err error) {
@@ -60,16 +60,23 @@ func genNextProcessorCode(proc *processorHandler, act *action) {
 	if proc == nil {
 		registerCode += "nil"
 	} else {
+		packageAlias := ""
 		name := proc.name
 		if err := checkProcessorFile(proc.name); err != nil {
 			fmt.Println(err.Error(), "in", act.name)
 			os.Exit(1)
 		}
 		nameSlice := strings.Split(proc.name, ".")
-		packages[strings.ReplaceAll(proc.name[:strings.LastIndex(proc.name, ".")], ".", "/")] = struct{}{}
+
 		if len(nameSlice) > 2 {
-			name = strings.Join(nameSlice[len(nameSlice)-2:], ".")
+			packageAlias = nameSlice[0]
+			for i := 1; i < len(nameSlice)-1; i++ {
+				packageAlias += strings.ToUpper(string(nameSlice[i][0])) + nameSlice[i][1:]
+			}
+			//packageAlias = strings.Join(nameSlice[:len(nameSlice)-1], "_")
+			name = packageAlias + "." + nameSlice[len(nameSlice)-1]
 		}
+		packages[strings.ReplaceAll(proc.name[:strings.LastIndex(proc.name, ".")], ".", "/")] = packageAlias
 		registerCode += "play.NewProcessorWrap(new(" + name + "),"
 		registerCode += "func(p play.Processor, ctx *play.Context) (string, error) {return play.RunProcessor(unsafe.Pointer(p.(*" + name + ")), unsafe.Sizeof(*p.(*" + name + ")),p, ctx)},"
 		if proc.next == nil {
@@ -99,8 +106,8 @@ func updateRegister(project, frameworkName string) (err error) {
 	for k, _ := range crontab {
 		src += fmt.Sprintf("\t\"%s/%s\"\n", module, k)
 	}
-	for k, _ := range packages {
-		src += fmt.Sprintf("\t\"%s/processor/%s\"\n", module, k)
+	for k, v := range packages {
+		src += fmt.Sprintf("\t%s \"%s/processor/%s\"\n", v, module, k)
 	}
 	if len(packages) > 0 {
 		src += "\"unsafe\"\n"
