@@ -379,7 +379,9 @@ func (q *query%s)Save(meta *Meta%s) error {
 	} else {
 		src += fmt.Sprintf(`
 func (q *query%s)Save(meta *Meta%s) error {
-	return %s.Save(meta, &q.query)
+	id, err := %s.Save(m, &q.query)
+	meta.Fid = int(id)
+	return err
 }
 `, funcName, funcName, meta.Strategy.Storage.Drive)
 	}
